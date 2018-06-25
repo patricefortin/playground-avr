@@ -3,7 +3,7 @@
 #define MSG_PROMPT "avr> "
 #define MSG_GREETINGS NL "---- AVR Shell ----" NL
 
-#define MSG_INVALID_CMD "Invalid cmd. Press 'h' for help." NL
+#define MSG_INVALID_CMD "Invalid cmd. Press '?' for help." NL
 
 void initShell(const char *cmds, const char *help);
 void printGreetings(void);

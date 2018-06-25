@@ -5,21 +5,21 @@
 #include "USART.h"
 #include "shell.h"
 
-#define CMDS "tmjkdih"
+#define CMDS "tmjkdi?"
 
 #define HELP \
   NL \
-  "Name: First shell" NL \
+  "Name: Avatar project" NL \
   "Version: 0.1" NL \
   NL \
   "Available commands:" NL \
   "    t toggle light" NL \
-  "    m set servo to middle position" NL \
-  "    j move servo to the right" NL \
-  "    k move servo to the left" NL \
-  "    d toggle debug flag" NL \
-  "    i print program info" NL \
-  "    h print help" NL
+  "    m servo 1 middle" NL \
+  "    j servo 1 down" NL \
+  "    k servo 1 up" NL \
+  "    d toggle debug" NL \
+  "    i print info" NL \
+  "    ? print help" NL
 
 #define SERVO_PIN PB1
 #define SERVO_PORT PORTB
@@ -29,12 +29,14 @@
 #define LED_PORT PORTD
 #define LED_DDR DDRD
 
+// Servo model is FS5323M
 #define PULSE_STEP        5
-#define PULSE_MIN         500  // Servo model is FS5323M
-#define PULSE_MIDDLE      1500
-#define PULSE_MAX         2500
+//#define PULSE_MIN         500  // Absolute min
+#define PULSE_MIN         1400   // Experimental min from physical setup
+#define PULSE_MIDDLE      1800
+//#define PULSE_MAX         2500 // Absolute max
+#define PULSE_MAX         2280   // Experimental max from physical setup
 #define PULSE_RANGE       (PULSE_MAX - PULSE_MIN)
-#define PULSE_OVER        3000 // Must be > PULSE_MAX
 #define PULSE_FREQUENCY   20000
 
 volatile uint8_t currentAngle = 90;
@@ -71,13 +73,19 @@ void resetServoMiddle(void) {
   setServoByAngle(90);
 }
 
-void moveServoDown(void) {
+/*
+ * Physical up direction is decreasing angle
+ */
+void moveServoUp(void) {
   uint8_t safe = PULSE_STEP;
   uint8_t angle = currentAngle < safe ? 0 : currentAngle - PULSE_STEP; // avoid underflow
   setServoByAngle(angle);
 }
 
-void moveServoUp(void) {
+/*
+ * Physical down is increasing angle
+ */
+void moveServoDown(void) {
   uint8_t safe = 180 - PULSE_STEP;
   uint8_t angle = currentAngle > safe ? 180 : currentAngle + PULSE_STEP;
   setServoByAngle(angle);
@@ -105,7 +113,7 @@ void executeCmd(char cmd) {
   if (cmd == 'k') moveServoUp();
   if (cmd == 'd') toggleDebug();
   if (cmd == 'i') printInfo();
-  if (cmd == 'h') printHelp();
+  if (cmd == '?') printHelp();
 }
 
 int main(void) {
